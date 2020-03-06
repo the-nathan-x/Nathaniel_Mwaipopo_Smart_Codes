@@ -1,0 +1,109 @@
+<html>
+<head>
+    <title>Administrator side</title>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBIFaoZOylbbYbhhb4fBBb6h12BoJelZkc",
+  authDomain: "smartcodes-project.firebaseapp.com",
+  databaseURL: "https://smartcodes-project.firebaseio.com",
+  projectId: "smartcodes-project",
+  storageBucket: "smartcodes-project.appspot.com",
+  messagingSenderId: "399152753753",
+  appId: "1:399152753753:web:9c04d9a830dd06acb89548",
+  measurementId: "G-C4RYDYJT4B"
+
+      };
+   
+      firebase.initializeApp(config);
+    </script>
+</head>
+<body>
+  
+ <h3>CAMPAIGNS</h3>
+ 
+ <table id="tbl_users_list" border="1">
+  <tr>
+   <td>Campaign Name</td>
+   <td>Campaign Date</td>
+  </tr>
+ </table>
+ 
+ <script>
+ 
+  var tblUsers = document.getElementById('tbl_users_list');
+  var databaseRef = firebase.database().ref('users/');
+  var rowIndex = 1;
+  
+  databaseRef.once('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+   var childKey = childSnapshot.key;
+   var childData = childSnapshot.val();
+   
+   var row = tblUsers.insertRow(rowIndex);
+   var cellId = row.insertCell(0);
+   var cellName = row.insertCell(1);
+   cellId.appendChild(document.createTextNode(childKey));
+   cellName.appendChild(document.createTextNode(childData.description));
+   
+   rowIndex = rowIndex + 1;
+    });
+  });
+   
+  function save_user(){
+   var description = document.getElementById('description').value;
+   var date = document.getElementById('date').value;
+   var campaign_name = document.getElementById('campaign_name').value;
+
+   var uid = firebase.database().ref().child('users').push().key;
+
+
+   var data = {
+    campaign_name: campaign_name,
+    date: date,
+    description: description
+   }
+   
+   var updates = {};
+   updates['/users/' + campaign_name] = data;
+   firebase.database().ref().update(updates);
+   
+   alert('Post is created successfully!');
+   reload_page();
+  }
+  
+  function update_user(){
+   var description = document.getElementById('description').value;
+   var campaign_name = document.getElementById('campaign_name').value;
+
+   var data = {
+    campaign_name: campaign_name,
+    description: description
+   }
+   
+   var updates = {};
+   updates['/users/' + campaign_name] = data;
+   firebase.database().ref().update(updates);
+   
+   alert('The user is updated successfully!');
+   
+   reload_page();
+  }
+  
+  function delete_user(){
+   var campaign_name = document.getElementById('campaign_name').value;
+  
+   firebase.database().ref().child('/users/' + campaign_name).remove();
+   alert('The user is deleted successfully!');
+   reload_page();
+  }
+  
+  function reload_page(){
+   window.location.reload();
+  }
+  
+ </script>
+ 
+</body>
+</html>
